@@ -1,29 +1,42 @@
 import mysql.connector
 import os
+import logging
 # Connect to MySQL database
-def doconnect():
+
+
+def fetch_data_from_utente(user,password):
+    # Configuration details for the MySQL connection
+    config = {
+        "host": "localhost",
+        "user": "root",
+        "password": "",
+        "database": "dbwarehouse"
+    }
+
+    # Establish a connection to the MySQL database
+    connection = mysql.connector.connect(**config)
+    cursor = connection.cursor()
 
     try:
-        connection = mysql.connector.connect(
-            host=os.getenv('hostname'),
-            user=os.getenv('username'),
-            password=os.getenv('password'),
-            database=os.getenv('database')
-        )
+        # Execute the SQL query
+        query = 'SELECT * FROM Utenti WHERE username = ? AND password = ?', (user, password)
+        print(query)
+        cursor.execute(query)
 
-        if connection.is_connected():
-           
+        # Fetch all rows from the result of the query
+        rows = cursor.fetchone()
 
-            
-            
-            print("Tables created successfully")
-            return True
-
+        # Print each row
+        for row in rows:
+            print(row)
+        return rows
     except mysql.connector.Error as error:
-        print(f"Failed to create table in MySQL: {error}")
+        print(f"Error: {error}")
     finally:
-        if connection.is_connected():
-            #cursor.close()
-            connection.close()
-            print("MySQL connection is closed")
+        # Close the cursor and connection
+        cursor.close()
+        connection.close()
+
+
+
     

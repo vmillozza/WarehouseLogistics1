@@ -3,16 +3,17 @@ from tkinter import messagebox
 from database import connector as connector
 
 def authenticate():
-    if username_entry.get() == "admin" and password_entry.get() == "password":
-        messagebox.showinfo("Successo", "Accesso effettuato con successo!")
+    
+    rows = connector.fetch_data_from_utente(username_entry.get(),password_entry.get())
+    
+    # Verifica se la coppia esiste nella lista
+    if len(rows)==1:
+        print("La coppia è presente nella lista!")
     else:
-        messagebox.showerror("Errore", "Username o password errati!")
+        print("La coppia non è presente nella lista.")
 
 # Crea la finestra principale
-if(connector.doconnect()):
-    messagebox.showinfo("Successo", "Caricamento db effettuato con successo!")
-else:
-    messagebox.showerror("Errore", "Caricamento db fallito!")
+
 root = tk.Tk()
 root.title("Form di Autenticazione")
 
