@@ -1,41 +1,25 @@
-import mysql.connector
+import mysql.connector as connector
 import os
-import logging
+
 # Connect to MySQL database
 
 
-def fetch_data_from_utente(user,password):
-    # Configuration details for the MySQL connection
-    config = {
-        "host": "localhost",
-        "user": "root",
-        "password": "",
-        "database": "dbwarehouse"
-    }
+def login(username, password):
+    conn = connector.connect(host="localhost",
+    username="root",
+    password="",
+    database="dbwarehouse")
+    cursor = conn.cursor(buffered=True)
 
-    # Establish a connection to the MySQL database
-    connection = mysql.connector.connect(**config)
-    cursor = connection.cursor()
+    # Ricerca dell'utente nel database
+    cursor.execute('SELECT username,password FROM Utenti WHERE username =  %s AND password =  %s ', (username, password))
+    row = cursor.fetchone()
 
-    try:
-        # Execute the SQL query
-        query = 'SELECT * FROM Utenti WHERE username = ? AND password = ?', (user, password)
-        print(query)
-        cursor.execute(query)
+    cursor.close()
+    conn.close()
+    return row
 
-        # Fetch all rows from the result of the query
-        rows = cursor.fetchone()
-
-        # Print each row
-        for row in rows:
-            print(row)
-        return rows
-    except mysql.connector.Error as error:
-        print(f"Error: {error}")
-    finally:
-        # Close the cursor and connection
-        cursor.close()
-        connection.close()
+    
 
 
 

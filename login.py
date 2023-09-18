@@ -4,13 +4,13 @@ from database import connector as connector
 
 def authenticate():
     
-    rows = connector.fetch_data_from_utente(username_entry.get(),password_entry.get())
+    row = connector.login(username_entry.get(),password_entry.get())
     
     # Verifica se la coppia esiste nella lista
-    if len(rows)==1:
-        print("La coppia è presente nella lista!")
+    if row is not  None:
+        print("Login eseguito con successo")
     else:
-        print("La coppia non è presente nella lista.")
+        print("Login non eseguito con successo")
 
 # Crea la finestra principale
 
