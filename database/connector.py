@@ -19,7 +19,22 @@ def login(username, password):
     conn.close()
     return row
 
+def elenco_prodotti():
+    conn = connector.connect(host="localhost",
+    username="root",
+    password="",
+    database="dbwarehouse")
+    cursor = conn.cursor(buffered=True)
+
+    # Ricerca dei prodotti
+    cursor.execute('SELECT nome_prodotto,codice,quantità,prezzo FROM prodotti ')
+    rows = cursor.fetchall()
+     # Print each row
     
+    cursor.close()
+    conn.close()
+    return rows
+
 
 
 

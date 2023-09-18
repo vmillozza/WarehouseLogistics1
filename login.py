@@ -1,7 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
 from database import connector as connector
-
+from forms import frmprodotti
+def display_products():
+    frmprodotti.display_products()
+    
+    
+def close_form():
+    root.destroy()
 def authenticate():
     
     row = connector.login(username_entry.get(),password_entry.get())
@@ -9,6 +15,9 @@ def authenticate():
     # Verifica se la coppia esiste nella lista
     if row is not  None:
         print("Login eseguito con successo")
+        close_form()
+        display_products()
+        
     else:
         print("Login non eseguito con successo")
 
