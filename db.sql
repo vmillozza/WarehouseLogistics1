@@ -29,3 +29,4 @@ CREATE TABLE Notifiche (
     messaggio TEXT NOT NULL,
     data_ora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+python in
