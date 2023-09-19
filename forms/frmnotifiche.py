@@ -102,4 +102,4 @@ def main_window():
     root.mainloop()
 
 # Esegui la GUI
-main_window()
+#main_window()

@@ -3,21 +3,24 @@ from tkinter import messagebox
 from database import connector as connector
 from forms import frmprodotti, frmutenti
 
-
 def display_products():
     frmprodotti.main_window()
 
-
 def close_form():
     root.destroy()
-
 
 def registrati():
     close_form()
     frmutenti.main_window()
 
-
 def authenticate():
+    vuoti = username_entry.get().strip() == "" or password_entry.get().strip() == ""
+
+    if vuoti:
+        messagebox.showerror("Errore", "Username e password non possono essere vuoti")
+        username_entry.focus_get()
+        return
+
     row = connector.login(username_entry.get(), password_entry.get())
 
     # Verifica se la coppia esiste nella lista
@@ -27,7 +30,7 @@ def authenticate():
         display_products()
     else:
         print("Login non eseguito con successo")
-
+        messagebox.showerror("Errore", "Login non eseguito con successo")
 
 # Crea la finestra principale
 root = tk.Tk()
