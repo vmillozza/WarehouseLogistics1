@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox
+from forms import frmnotifiche,frmprodotti
 import mysql.connector
 
 # Connessione al database
@@ -56,6 +57,17 @@ def main_window():
         quantità_ordinata = simpledialog.askinteger("Inserisci Ordine", "Inserisci Quantità Ordinata:")
         codice_spedizione = simpledialog.askstring("Inserisci Ordine", "Inserisci Codice Spedizione:")
         insert_order(prodottoID, quantità_ordinata, codice_spedizione)
+        #- Quando un prodotto viene ordinato.
+        frmnotifiche.insert_notification('Oradinato un nuovo rodotto %s  ',prodottoID)
+        '''
+        - Gestione Ordini: Quando un ordine viene effettuato, il sistema deve:
+        - Ridurre automaticamente la quantità del prodotto in magazzino.
+         
+        - Generare un codice di spedizione casuale se il prodotto è disponibile.
+        - Segnare la riga in rosso se il prodotto non è disponibile.
+        '''
+        frmprodotti.decrement_product_quantity(prodottoID)
+        
         show_orders()
 
     def edit_order():

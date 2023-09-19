@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, simpledialog
+from forms import frmnotifiche
 import mysql.connector
 
 # Connessione al database
@@ -14,6 +15,8 @@ def insert_product(nome, codice, quantita, prezzo):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO Prodotti (nome_prodotto, codice, quantità, prezzo) VALUES (%s, %s, %s, %s)", (nome, codice, quantita, prezzo))
+    #- Quando un nuovo prodotto entra in magazzino.
+    frmnotifiche.insert_notification('Inserito un nuovo rodotto %s %s ',nome, codice)
     conn.commit()
     cursor.close()
     conn.close()
@@ -25,7 +28,13 @@ def update_product(prodottoID, nome, codice, quantita, prezzo):
     conn.commit()
     cursor.close()
     conn.close()
-
+def decrement_product_quantity(prodottoID):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE Prodotti SET quantità=quantità-1 where quantità > 0",  prodottoID)
+    conn.commit()
+    cursor.close()
+    conn.close()
 def delete_product(prodottoID,quantita):
     conn = get_connection()
     cursor = conn.cursor()
@@ -42,10 +51,19 @@ def get_products():
     cursor.close()
     conn.close()
     return products
+
+def get_products_with_quantity(q):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Prodotti where quantità=%s",q)
+    products = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return products
 def main_window():
     root = tk.Tk()
     root.title("Gestione Prodotti")
-
+    
     def refresh_listbox():
         products = get_products()
         listbox.delete(0, tk.END)
@@ -79,7 +97,15 @@ def main_window():
         prodottoID = int(listbox.get(selected).split(" - ")[0])
         delete_product(prodottoID,None)
         refresh_listbox()
+    
+    prodotti_quantita_uno = len(get_products_with_quantity(1)) >0
+    prodotti_quantita_zero =len(get_products_with_quantity(0)) >0
 
+    if(prodotti_quantita_uno):
+        frmnotifiche.insert_notification('I seguenti prodotti stanno per esaurirsi')
+    if(prodotti_quantita_zero):
+        frmnotifiche.insert_notification('I seguenti prodotti non sono più disponibili')
+    
     listbox = tk.Listbox(root,width=100)
     listbox.pack(pady=20)
 
