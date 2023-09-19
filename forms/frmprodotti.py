@@ -80,7 +80,7 @@ def main_window():
         delete_product(prodottoID,None)
         refresh_listbox()
 
-    listbox = tk.Listbox(root)
+    listbox = tk.Listbox(root,width=100)
     listbox.pack(pady=20)
 
     btn_add = tk.Button(root, text="Aggiungi", command=add_product)
@@ -95,7 +95,7 @@ def main_window():
     refresh_listbox()
     # Center the window on the screen
     window_width = 300
-    window_height = 250
+    window_height = 450
 
     # Get the screen width and height
     screen_width = root.winfo_screenwidth()
