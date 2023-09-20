@@ -55,7 +55,8 @@ def get_products():
 def get_products_with_quantity(q):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Prodotti where quantità=%s",q)
+    print("SELECT nome_prodotto FROM Prodotti where quantità=%s",(q,))
+    cursor.execute("SELECT nome_prodotto FROM Prodotti where quantità=%s",(q,))
     products = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -134,5 +135,6 @@ def main_window():
     root.geometry(f'{window_width}x{window_height}+{int(x)}+{int(y)}')
 
     root.mainloop()
+#main_window()
 
 
