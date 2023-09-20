@@ -16,7 +16,7 @@ def insert_product(nome, codice, quantita, prezzo):
     cursor = conn.cursor()
     cursor.execute("INSERT INTO Prodotti (nome_prodotto, codice, quantità, prezzo) VALUES (%s, %s, %s, %s)", (nome, codice, quantita, prezzo))
     #- Quando un nuovo prodotto entra in magazzino.
-    frmnotifiche.insert_notification('Inserito un nuovo rodotto %s %s ',nome, codice)
+    frmnotifiche.insert_notification('Inserito un nuovo prodotto %s %s' % (nome, codice))
     conn.commit()
     cursor.close()
     conn.close()
@@ -38,7 +38,8 @@ def decrement_product_quantity(prodottoID):
 def delete_product(prodottoID,quantita):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE Prodotti SET quantità=%s WHERE prodottoID=%s,quantità=%s", (prodottoID,quantita))
+    cursor.execute("UPDATE Prodotti SET quantità=%s WHERE prodottoID=%s", (quantita, prodottoID))
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -107,21 +108,22 @@ def main_window():
     if(prodotti_quantita_zero):
         frmnotifiche.insert_notification('I seguenti prodotti non sono più disponibili')
     
-    listbox = tk.Listbox(root,width=100)
-    listbox.pack(pady=20)
+    listbox = tk.Listbox(root, width=100)
+    listbox.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
 
     btn_add = tk.Button(root, text="Aggiungi", command=add_product)
-    btn_add.pack()
+    btn_add.grid(row=1, column=0, padx=10, pady=10)
 
     btn_edit = tk.Button(root, text="Modifica", command=edit_product)
-    btn_edit.pack()
+    btn_edit.grid(row=1, column=1, padx=10, pady=10)
 
     btn_delete = tk.Button(root, text="Cancella", command=remove_product)
-    btn_delete.pack()
+    btn_delete.grid(row=1, column=2, padx=10, pady=10)
 
     refresh_listbox()
+
     # Center the window on the screen
-    window_width = 300
+    window_width = 600  # Aumentato per adattarsi meglio ai contenuti
     window_height = 450
 
     # Get the screen width and height
@@ -135,6 +137,6 @@ def main_window():
     root.geometry(f'{window_width}x{window_height}+{int(x)}+{int(y)}')
 
     root.mainloop()
-#main_window()
+    #main_window()
 
 
