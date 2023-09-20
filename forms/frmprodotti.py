@@ -70,25 +70,30 @@ def main_window():
         products = get_products()
         listbox.delete(0, tk.END)
         for product in products:
-            listbox.insert(tk.END, f"{product[0]} - {product[1]} -{product[2]}-{product[3]}-{product[4]}")
+            listbox.insert(tk.END, f"{product[0]}|{product[1]}|{product[2]}|{product[3]}|{product[4]}")
 
     def add_product():
-        nome = simpledialog.askstring("Inserimento", "Nome Prodotto:")
-        codice = simpledialog.askstring("Inserimento", "Codice:")
-        quantita = simpledialog.askinteger("Inserimento", "Quantità:")
-        prezzo = simpledialog.askfloat("Inserimento", "Prezzo:")
+        nome = simpledialog.askstring("Inserimento", "Nome Prodotto:").strip('|')
+        codice = simpledialog.askstring("Inserimento", "Codice:").strip('|')
+        quantita = simpledialog.askinteger("Inserimento", "Quantità:").strip('|')
+        prezzo = simpledialog.askfloat("Inserimento", "Prezzo:").strip('|')
         insert_product(nome, codice, quantita, prezzo)
         refresh_listbox()
 
     def edit_product():
         selected = listbox.curselection()
+        selected_items = [listbox.get(i) for i in selected]
+        print(selected_items)
         if not selected:
             return
-        prodottoID = int(listbox.get(selected).split(" - ")[0])
-        nome = simpledialog.askstring("Modifica", "Nome Prodotto:")
-        codice = simpledialog.askstring("Modifica", "Codice:")
-        quantita = simpledialog.askinteger("Modifica", "Quantità:")
-        prezzo = simpledialog.askfloat("Modifica", "Prezzo:")
+        prodottoID = int(listbox.get(selected).split("|")[0])
+        #risultato = "pari" if x % 2 == 0 else "dispari"
+        nome = listbox.get(selected).split("|")[1] 
+        codice =  listbox.get(selected).split("|")[2]#2
+        quantita = simpledialog.askinteger("Modifica", "Quantità:") 
+        prezzo = simpledialog.askfloat("Modifica", "Prezzo:") 
+        if(quantita=="0"):
+            frmnotifiche.insert_notification('I seguenti prodotti %s non sono più disponibili',(nome,))
         update_product(prodottoID, nome, codice, quantita, prezzo)
         refresh_listbox()
 
