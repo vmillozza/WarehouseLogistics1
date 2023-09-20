@@ -14,9 +14,9 @@ def get_connection():
 def insert_product(nome, codice, quantita, prezzo):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Prodotti (nome_prodotto, codice, quantità, prezzo) VALUES (%s, %s, %s, %s)", (nome, codice, quantita, prezzo))
+    cursor.execute("INSERT INTO Prodotti (nome_prodotto, codice, quantità, prezzo) VALUES (?, ?, ?, ?)", (nome, codice, quantita, prezzo))
     #- Quando un nuovo prodotto entra in magazzino.
-    frmnotifiche.insert_notification('Inserito un nuovo prodotto %s %s' % (nome, codice))
+    frmnotifiche.insert_notification('Inserito un nuovo prodotto ? ?' % (nome, codice))
     conn.commit()
     cursor.close()
     conn.close()
@@ -24,7 +24,7 @@ def insert_product(nome, codice, quantita, prezzo):
 def update_product(prodottoID, nome, codice, quantita, prezzo):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE Prodotti SET nome_prodotto=%s, codice=%s, quantità=%s, prezzo=%s WHERE prodottoID=%s", (nome, codice, quantita, prezzo, prodottoID))
+    cursor.execute("UPDATE Prodotti SET nome_prodotto=?, codice=?, quantità=?, prezzo=? WHERE prodottoID=?", (nome, codice, quantita, prezzo, prodottoID))
     conn.commit()
     cursor.close()
     conn.close()
@@ -38,7 +38,7 @@ def decrement_product_quantity(prodottoID):
 def delete_product(prodottoID,quantita):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE Prodotti SET quantità=%s WHERE prodottoID=%s", (quantita, prodottoID))
+    cursor.execute("UPDATE Prodotti SET quantità=? WHERE prodottoID=?", (quantita, prodottoID))
 
     conn.commit()
     cursor.close()
@@ -56,8 +56,8 @@ def get_products():
 def get_products_with_quantity(q):
     conn = get_connection()
     cursor = conn.cursor()
-    print("SELECT nome_prodotto FROM Prodotti where quantità=%s",(q,))
-    cursor.execute("SELECT nome_prodotto FROM Prodotti where quantità=%s",(q,))
+    print("SELECT nome_prodotto FROM Prodotti where quantità=?",(q,))
+    cursor.execute("SELECT nome_prodotto FROM Prodotti where quantità=?",(q,))
     products = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -73,7 +73,7 @@ def main_window():
             quantita = listbox.get(selected).split("|")[4]
             delete_product(prodid,1)
             frmordini.insert_order(prodid,quantita)
-            frmnotifiche.insert_notification('Oradinato un nuovo rodotto %s  ',prodid)
+            frmnotifiche.insert_notification('Oradinato un nuovo rodotto ?  ',prodid)
             frmordini.main_window()
     def refresh_listbox():
         products = get_products()
@@ -99,13 +99,13 @@ def main_window():
         if not selected:
             return
         prodottoID = int(listbox.get(selected).split("|")[0])
-        #risultato = "pari" if x % 2 == 0 else "dispari"
+   
         nome = listbox.get(selected).split("|")[1] 
         codice =  listbox.get(selected).split("|")[2]#2
         quantita = simpledialog.askinteger("Modifica", "Quantità:") 
         prezzo = simpledialog.askfloat("Modifica", "Prezzo:") 
         if(quantita=="0"):
-            frmnotifiche.insert_notification('I seguenti prodotti %s non sono più disponibili',(nome,))
+            frmnotifiche.insert_notification('I seguenti prodotti ? non sono più disponibili',(nome,))
         update_product(prodottoID, nome, codice, quantita, prezzo)
         refresh_listbox()
 
