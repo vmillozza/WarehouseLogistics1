@@ -71,7 +71,7 @@ def main_window():
         if(selected !=None):
             prodid = listbox.get(selected).split("|")[0]
             quantita = listbox.get(selected).split("|")[4]
-            delete_product(prodid,quantita-=1)
+            delete_product(prodid,1)
             frmordini.insert_order(prodid,quantita)
             frmnotifiche.insert_notification('Oradinato un nuovo rodotto %s  ',prodid)
             frmordini.main_window()
