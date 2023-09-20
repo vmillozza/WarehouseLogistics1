@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, simpledialog
-from forms import frmnotifiche
+from forms import frmnotifiche,frmordini
 import mysql.connector
 
 # Connessione al database
@@ -62,13 +62,25 @@ def get_products_with_quantity(q):
     cursor.close()
     conn.close()
     return products
+
 def main_window():
     root = tk.Tk()
     root.title("Gestione Prodotti")
-    
+    def goto_orders():
+        selected = listbox.curselection()
+        if(selected !=None):
+            prodid = listbox.get(selected).split("|")[0]
+            quantita = listbox.get(selected).split("|")[4]
+            delete_product(prodid,quantita-=1)
+            frmordini.insert_order(prodid,quantita)
+            frmnotifiche.insert_notification('Oradinato un nuovo rodotto %s  ',prodid)
+            frmordini.main_window()
     def refresh_listbox():
         products = get_products()
         listbox.delete(0, tk.END)
+        # Creazione di un label
+       
+     
         for product in products:
             listbox.insert(tk.END, f"{product[0]}|{product[1]}|{product[2]}|{product[3]}|{product[4]}")
 
@@ -105,6 +117,7 @@ def main_window():
         delete_product(prodottoID,None)
         refresh_listbox()
     
+    
     prodotti_quantita_uno = len(get_products_with_quantity(1)) >0
     prodotti_quantita_zero =len(get_products_with_quantity(0)) >0
 
@@ -113,22 +126,27 @@ def main_window():
     if(prodotti_quantita_zero):
         frmnotifiche.insert_notification('I seguenti prodotti non sono più disponibili')
     
+    label = tk.Label(root, text="Id | Nome | Codice | Quantita | Prezzo")
+    label.grid(row=0, column=0, padx=0, pady=0)
+
     listbox = tk.Listbox(root, width=100)
-    listbox.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
+    listbox.grid(row=1, column=0, columnspan=3, padx=10, pady=10)
 
     btn_add = tk.Button(root, text="Aggiungi", command=add_product)
-    btn_add.grid(row=1, column=0, padx=10, pady=10)
+    btn_add.grid(row=2, column=0, padx=10, pady=10)
 
     btn_edit = tk.Button(root, text="Modifica", command=edit_product)
-    btn_edit.grid(row=1, column=1, padx=10, pady=10)
+    btn_edit.grid(row=2, column=1, padx=10, pady=10)
 
     btn_delete = tk.Button(root, text="Cancella", command=remove_product)
-    btn_delete.grid(row=1, column=2, padx=10, pady=10)
-
+    btn_delete.grid(row=2, column=2, padx=10, pady=10)
+    btn_order = tk.Button(root, text="Seleziona prodotto per ordinare", command=goto_orders)
+    btn_order.grid(row=2, column=3, padx=10, pady=10)
+ 
     refresh_listbox()
 
     # Center the window on the screen
-    window_width = 600  # Aumentato per adattarsi meglio ai contenuti
+    window_width = 800  # Aumentato per adattarsi meglio ai contenuti
     window_height = 450
 
     # Get the screen width and height

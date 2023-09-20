@@ -84,6 +84,8 @@ def main_window():
         show_orders()
 
     def show_orders():
+        label = tk.Label(root, text="Id |  Quantita | Codice spedizione")
+        label.grid(row=0, column=0, padx=0, pady=0)
         for widget in root.winfo_children():
             widget.destroy()
         orders = get_orders()
@@ -114,4 +116,4 @@ def main_window():
     root.mainloop()
 
 # Esegui la GUI
-main_window()
+#main_window()
