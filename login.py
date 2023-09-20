@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, font
 from database import connector as connector
 from forms import frmprodotti, frmutenti
 
@@ -23,7 +23,6 @@ def authenticate():
 
     row = connector.login(username_entry.get(), password_entry.get())
 
-    # Verifica se la coppia esiste nella lista
     if row is not None:
         print("Login eseguito con successo")
         close_form()
@@ -32,39 +31,44 @@ def authenticate():
         print("Login non eseguito con successo")
         messagebox.showerror("Errore", "Login non eseguito con successo")
 
-# Crea la finestra principale
 root = tk.Tk()
 root.title("Form di Autenticazione")
+root.configure(bg='#f2f2f2')
 
-# Crea e posiziona le etichette e i campi di input
-username_label = tk.Label(root, text="Username:")
-username_label.pack(pady=10)
+# Font personalizzati
+label_font = font.Font(size=12, weight='bold')
+entry_font = font.Font(size=10)
+button_font = font.Font(size=10, weight='bold')
 
-username_entry = tk.Entry(root)
-username_entry.pack(pady=10)
+# Frame centrale
+frame = tk.Frame(root, bg='#f2f2f2')
+frame.pack(pady=40, padx=40)
 
-password_label = tk.Label(root, text="Password:")
-password_label.pack(pady=10)
+# Etichette, campi di input e pulsanti
+username_label = tk.Label(frame, text="Username:", font=label_font, bg='#f2f2f2')
+username_label.grid(row=0, column=0, sticky='w', pady=10)
 
-password_entry = tk.Entry(root, show="*")
-password_entry.pack(pady=10)
+username_entry = tk.Entry(frame, font=entry_font)
+username_entry.grid(row=1, column=0, pady=5, padx=20, sticky='ew')
 
-# Crea e posiziona il pulsante di login
-login_button = tk.Button(root, text="Login", command=authenticate)
-login_button.pack(pady=20)
+password_label = tk.Label(frame, text="Password:", font=label_font, bg='#f2f2f2')
+password_label.grid(row=2, column=0, sticky='w', pady=10)
 
-reg_button = tk.Button(root, text="Registratu", command=registrati)
-reg_button.pack(pady=20)
+password_entry = tk.Entry(frame, show="*", font=entry_font)
+password_entry.grid(row=3, column=0, pady=5, padx=20, sticky='ew')
 
-# Center the window on the screen
-window_width = 300
-window_height = 350
+login_button = tk.Button(frame, text="Login", command=authenticate, font=button_font, bg='#4CAF50', fg='white')
+login_button.grid(row=4, column=0, pady=20, padx=20, sticky='ew')
 
-# Get the screen width and height
+reg_button = tk.Button(frame, text="Registrati", command=registrati, font=button_font, bg='#FFC107')
+reg_button.grid(row=5, column=0, pady=5, padx=20, sticky='ew')
+
+window_width = 350
+window_height = 400
+
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
-# Calculate the x and y coordinates to center the window
 x = (screen_width / 2) - (window_width / 2)
 y = (screen_height / 2) - (window_height / 2)
 
