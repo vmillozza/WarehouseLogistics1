@@ -60,9 +60,8 @@ class OrdiniApp(tk.Tk):
         self.tvOrdini.heading('Codice', text='Codice')
         self.tvOrdini.pack(pady=20)
         self.tvOrdini.bind("<<TreeviewSelect>>", self.show_selected_record)
-        if(IdProdotto==None){
+        if(IdProdotto==None):
             self.load_ordini_data()
-        }
         else:
             self.load_ordini_data(IdProdotto)
        
