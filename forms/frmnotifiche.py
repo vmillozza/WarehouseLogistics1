@@ -1,48 +1,42 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox
-import mysql.connector
+import sqlite3 as sqlite3
 
-# Connessione al database
-def get_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="dbwarehouse"
-    )
+sqliteConnection = sqlite3.connect('./database/dbwarehouse.db')
+cursor = sqliteConnection.cursor()
+
 
 # Funzioni CRUD
 def insert_notification(message):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO Notifiche (messaggio) VALUES (?)", (message,))
-    conn.commit()
+    query = "INSERT INTO Notifiche (messaggio) VALUES (?)"
+    cursor.execute(query, (message))
+    sqliteConnection.commit()
+    
     cursor.close()
-    conn.close()
+    sqliteConnection.close()
 
 def update_notification(id, new_message):
-    conn = get_connection()
-    cursor = conn.cursor()
+   
     cursor.execute("UPDATE Notifiche SET messaggio = ? WHERE notificaID = ?", (new_message, id))
-    conn.commit()
+    sqliteConnection.commit()
     cursor.close()
-    conn.close()
+    sqliteConnection.close()
 
 def delete_notification(id):
-    conn = get_connection()
-    cursor = conn.cursor()
+  
+
     cursor.execute("DELETE FROM Notifiche WHERE notificaID = ?", (id,))
-    conn.commit()
+    sqliteConnection.commit()
     cursor.close()
-    conn.close()
+    sqliteConnection.close()
 
 def get_notifications():
-    conn = get_connection()
-    cursor = conn.cursor()
+   
+ 
     cursor.execute("SELECT * FROM Notifiche")
     rows = cursor.fetchall()
     cursor.close()
-    conn.close()
+    sqliteConnection.close()
     return rows
 
 # GUI
