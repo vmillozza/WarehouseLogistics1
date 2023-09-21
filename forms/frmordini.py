@@ -16,7 +16,7 @@ def get_connection():
 def insert_order(prodottoID, quantità_ordinata, codice_spedizione):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Ordini (prodottoID, quantità_ordinata, codice_spedizione) VALUES (%s, %s, %s)", (prodottoID, quantità_ordinata, codice_spedizione))
+    cursor.execute("INSERT INTO Ordini (prodottoID, quantità_ordinata, codice_spedizione) VALUES (?, ?, ?)", (prodottoID, quantità_ordinata, codice_spedizione))
     conn.commit()
     cursor.close()
     conn.close()
@@ -24,7 +24,7 @@ def insert_order(prodottoID, quantità_ordinata, codice_spedizione):
 def update_order(ordineID, prodottoID, quantità_ordinata, codice_spedizione):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE Ordini SET prodottoID=%s, quantità_ordinata=%s, codice_spedizione=%s WHERE ordineID=%s", (prodottoID, quantità_ordinata, codice_spedizione, ordineID))
+    cursor.execute("UPDATE Ordini SET prodottoID=?, quantità_ordinata=?, codice_spedizione=? WHERE ordineID=?", (prodottoID, quantità_ordinata, codice_spedizione, ordineID))
     conn.commit()
     cursor.close()
     conn.close()
@@ -32,7 +32,7 @@ def update_order(ordineID, prodottoID, quantità_ordinata, codice_spedizione):
 def delete_order(ordineID):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM Ordini WHERE ordineID=%s", (ordineID,))
+    cursor.execute("DELETE FROM Ordini WHERE ordineID=?", (ordineID,))
     conn.commit()
     cursor.close()
     conn.close()
@@ -58,7 +58,7 @@ def main_window():
         codice_spedizione = simpledialog.askstring("Inserisci Ordine", "Inserisci Codice Spedizione:")
         insert_order(prodottoID, quantità_ordinata, codice_spedizione)
         #- Quando un prodotto viene ordinato.
-        frmnotifiche.insert_notification('Oradinato un nuovo rodotto %s  ',prodottoID)
+        frmnotifiche.insert_notification('Oradinato un nuovo rodotto ?  ',prodottoID)
         '''
         - Gestione Ordini: Quando un ordine viene effettuato, il sistema deve:
         - Ridurre automaticamente la quantità del prodotto in magazzino.

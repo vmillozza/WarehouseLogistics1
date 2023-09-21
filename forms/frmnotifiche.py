@@ -15,7 +15,7 @@ def get_connection():
 def insert_notification(message):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO Notifiche (messaggio) VALUES (%s)", (message,))
+    cursor.execute("INSERT INTO Notifiche (messaggio) VALUES (?)", (message,))
     conn.commit()
     cursor.close()
     conn.close()
@@ -23,7 +23,7 @@ def insert_notification(message):
 def update_notification(id, new_message):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE Notifiche SET messaggio = %s WHERE notificaID = %s", (new_message, id))
+    cursor.execute("UPDATE Notifiche SET messaggio = ? WHERE notificaID = ?", (new_message, id))
     conn.commit()
     cursor.close()
     conn.close()
@@ -31,7 +31,7 @@ def update_notification(id, new_message):
 def delete_notification(id):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM Notifiche WHERE notificaID = %s", (id,))
+    cursor.execute("DELETE FROM Notifiche WHERE notificaID = ?", (id,))
     conn.commit()
     cursor.close()
     conn.close()
