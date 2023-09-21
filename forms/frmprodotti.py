@@ -4,7 +4,7 @@ import tkinter.messagebox as mb
 import tkinter.ttk as ttk
 import sqlite3 as sqlite3
 
-import frmnotifiche
+from forms import frmordini,frmnotifiche
 
 # Connessione al database
 sqliteConnection = sqlite3.connect('./database/dbwarehouse.db')
@@ -39,8 +39,8 @@ class ProdottiApp(tk.Tk):
         self.entQuantita.pack(pady=5)
         self.lblPrezzo.pack(pady=5)
         self.entPrezzo.pack(pady=5)
-        self.entSearch = tk.Entry(self)
-        self.btn_search = tk.Button(self, text="Search", font=("Helvetica", 11), bg="yellow", fg="blue",command=None)
+        #self.entSearch = tk.Entry(self)
+        self.btn_gest_ordini = tk.Button(self, text="Ordini", font=("Helvetica", 11), bg="yellow", fg="blue",command=self.GestOrdini)
         
        
         # Bottoni
@@ -53,6 +53,7 @@ class ProdottiApp(tk.Tk):
         self.btn_update = tk.Button(self,text="Update",font=("Helvetica",11),bg="yellow", fg="blue",command=self.update_prodotti_data)
         self.btn_update.pack()
         # Treeview per mostrare i prodotti
+        self.btn_gest_ordini.pack()
         
         self.tvProdotti = ttk.Treeview(self, columns=('Id','Nome Prodotto', 'Codice', 'Quantità', 'Prezzo'))
         self.tvProdotti.heading('Id', text='Id')
@@ -81,7 +82,16 @@ class ProdottiApp(tk.Tk):
         sqliteConnection.commit()
         mb.showinfo("Info", "Aggiornato con successo")
         self.load_prodotti_data()
-
+    def close_form(self):
+        self.destroy()
+    
+    def GestOrdini(self):
+        for selection in self.tvProdotti.selection():
+            item = self.tvProdotti.item(selection)
+        Id = item["values"][0]
+        self.close_form()
+        frmordini.OrdiniApp(IdProdotto=Id)
+    
     def register_prodotto(self):
         if(self.entNomeProdotto.get().strip()!="") :
            nome_prodotto = self.entNomeProdotto.get()

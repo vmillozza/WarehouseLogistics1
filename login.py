@@ -27,7 +27,7 @@ def authenticate():
         if row is not None:
             print("Login eseguito con successo")
             close_form()
-            display_products()
+            frmprodotti.ProdottiApp()
         else:
             print("Login non eseguito con successo")
             messagebox.showerror("Errore", "Login non eseguito con successo")

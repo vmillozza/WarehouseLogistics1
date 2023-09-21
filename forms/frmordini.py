@@ -1,119 +1,165 @@
+from tkcalendar import Calendar, DateEntry
 import tkinter as tk
-from tkinter import simpledialog, messagebox
-from forms import frmnotifiche,frmprodotti
-import mysql.connector
+import tkinter.messagebox as mb
+import tkinter.ttk as ttk
+import sqlite3 as sqlite3
 
+from forms import frmnotifiche
 # Connessione al database
-def get_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="dbwarehouse"
-    )
+sqliteConnection = sqlite3.connect('./database/dbwarehouse.db')
+cursor = sqliteConnection.cursor()
 
-# Funzioni CRUD
-def insert_order(prodottoID, quantità_ordinata, codice_spedizione):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO Ordini (prodottoID, quantità_ordinata, codice_spedizione) VALUES (?, ?, ?)", (prodottoID, quantità_ordinata, codice_spedizione))
-    conn.commit()
-    cursor.close()
-    conn.close()
 
-def update_order(ordineID, prodottoID, quantità_ordinata, codice_spedizione):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE Ordini SET prodottoID=?, quantità_ordinata=?, codice_spedizione=? WHERE ordineID=?", (prodottoID, quantità_ordinata, codice_spedizione, ordineID))
-    conn.commit()
-    cursor.close()
-    conn.close()
+class OrdiniApp(tk.Tk):
+    def __init__(self,IdProdotto):
+        super().__init__()
+        self.title("Gestione Ordini")
+        self.geometry("1200x650+351+174")
 
-def delete_order(ordineID):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM Ordini WHERE ordineID=?", (ordineID,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-def get_orders():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Ordini")
-    orders = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return orders
-
-# GUI
-def main_window():
-    root = tk.Tk()
-    root.title("Gestione Ordini")
-
-    # Funzioni per i pulsanti
-    def add_order():
-        prodottoID = simpledialog.askinteger("Inserisci Ordine", "Inserisci ID Prodotto:")
-        quantità_ordinata = simpledialog.askinteger("Inserisci Ordine", "Inserisci Quantità Ordinata:")
-        codice_spedizione = simpledialog.askstring("Inserisci Ordine", "Inserisci Codice Spedizione:")
-        insert_order(prodottoID, quantità_ordinata, codice_spedizione)
-        #- Quando un prodotto viene ordinato.
-        frmnotifiche.insert_notification('Oradinato un nuovo rodotto ?  ',prodottoID)
-        '''
-        - Gestione Ordini: Quando un ordine viene effettuato, il sistema deve:
-        - Ridurre automaticamente la quantità del prodotto in magazzino.
-         
-        - Generare un codice di spedizione casuale se il prodotto è disponibile.
-        - Segnare la riga in rosso se il prodotto non è disponibile.
-        '''
-        frmprodotti.decrement_product_quantity(prodottoID)
+        # Etichette e campi di input
+        self.lblTitle = tk.Label(self, text="Gestione Ordini", font=("Helvetica", 16), bg="yellow", fg="green")
+        self.lblProdottoId = tk.Label(self, text="Prodotto Id:", font=("Helvetica", 10), bg="blue", fg="yellow")
+        self.lblQuantita = tk.Label(self, text="Quantità:", font=("Helvetica", 10), bg="blue", fg="yellow")
+        self.lblCodice = tk.Label(self, text="Codice Spedizione:", font=("Helvetica", 10), bg="blue", fg="yellow")
         
-        show_orders()
 
-    def edit_order():
-        ordineID = simpledialog.askinteger("Modifica Ordine", "Inserisci ID Ordine da modificare:")
-        prodottoID = simpledialog.askinteger("Modifica Ordine", "Inserisci nuovo ID Prodotto:")
-        quantità_ordinata = simpledialog.askinteger("Modifica Ordine", "Inserisci nuova Quantità Ordinata:")
-        codice_spedizione = simpledialog.askstring("Modifica Ordine", "Inserisci nuovo Codice Spedizione:")
-        update_order(ordineID, prodottoID, quantità_ordinata, codice_spedizione)
-        show_orders()
+        self.entProdottoId = tk.Entry(self)
+        self.entQuantita = tk.Entry(self)
+        self.entCodice = tk.Entry(self)
+        
 
-    def remove_order():
-        ordineID = simpledialog.askinteger("Rimuovi Ordine", "Inserisci ID Ordine da rimuovere:")
-        delete_order(ordineID)
-        show_orders()
+        # Posizionamento degli elementi
+        self.lblTitle.pack(pady=20)
+        self.lblProdottoId.pack(pady=5)
+       
+        self.lblCodice.pack(pady=5)
+      
+        self.lblQuantita.pack(pady=5)
+       
+       
+        self.entSearch = tk.Entry(self)
+        self.btn_search = tk.Button(self, text="Search", font=("Helvetica", 11), bg="yellow", fg="blue",command=None)
+        
+       
+        # Bottoni
+        self.btn_register = tk.Button(self, text="Registra", command=self.register_ordine)
+        self.btn_register.pack(pady=20)
+      
+        self.btn_delete = tk.Button(self, text="Delete", font=("Helvetica", 11), bg="yellow", fg="blue",
+                                    command=self.delete_ordine_data)
+        self.btn_delete.pack()
+        self.btn_update = tk.Button(self,text="Update",font=("Helvetica",11),bg="yellow", fg="blue",command=self.update_ordini_data)
+        self.btn_update.pack()
+        # Treeview per mostrare i prodotti
+        
+        self.tvOrdini = ttk.Treeview(self, columns=('Id','Prodotto Id','Quantità','Codice'))
+        self.tvOrdini.heading('Id', text='Id')
+        self.tvOrdini.heading('Prodotto Id', text='Prodotto Id')
+        
+        self.tvOrdini.heading('Quantità', text='Quantità')
+        self.tvOrdini.heading('Codice', text='Codice')
+        self.tvOrdini.pack(pady=20)
+        self.tvOrdini.bind("<<TreeviewSelect>>", self.show_selected_record)
+        if(IdProdotto==None){
+            self.load_ordini_data()
+        }
+        else:
+            self.load_ordini_data(IdProdotto)
+       
+    def update_ordini_data(self):
+    
+        prodotto_id = self.entProdottoId.get()  # Assumo che tu stia cercando di ottenere il valore da un widget Entry
+        codice = self.entCodice.get()
+        quantita = self.entQuantita.get()
+        for selection in self.tvOrdini.selection():
+            item = self.tvOrdini.item(selection)
+        Id = item["values"][0]
+        # Preparazione della query
+        Update = "UPDATE Ordini SET prodottoID=?, codice=?, quantità_ordinata=?, codice_spedizione=? WHERE ordineID=?"
 
-    def show_orders():
-        label = tk.Label(root, text="Id |  Quantita | Codice spedizione")
-        label.grid(row=0, column=0, padx=0, pady=0)
-        for widget in root.winfo_children():
-            widget.destroy()
-        orders = get_orders()
-        i = 0  # Inizializza i a 0
-        for i, order in enumerate(orders):
-            for j, field in enumerate(order):
-                e = tk.Entry(root)
-                e.grid(row=i, column=j)
-                e.insert(tk.END, field)
-        tk.Button(root, text="Aggiungi Ordine", command=add_order).grid(row=i+1, column=0)
-        tk.Button(root, text="Modifica Ordine", command=edit_order).grid(row=i+1, column=1)
-        tk.Button(root, text="Rimuovi Ordine", command=remove_order).grid(row=i+1, column=2)
+        # Esecuzione della query con parametri
+        cursor.execute(Update, (prodotto_id, codice, quantita, Id))  # Assumo che prodottoID sia definito altrove nel tuo codice
 
-    show_orders()
-    # Center the window on the screen
-    window_width = 500
-    window_height = 350
+        sqliteConnection.commit()
+        mb.showinfo("Info", "Aggiornato con successo")
+        self.load_ordini_data()
 
-    # Get the screen width and height
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
+    def register_ordine(self):
+        if(self.entProdottoId.get().strip()!="") :
+           prodotto_id = self.entProdottoId.get()
+        else:
+         mb.showerror("Errore", "Si è verificato un errore:id prodotto non può essere vuoto")
+         return
+        
+        if(self.entCodice.get().strip()!="") :
+           codice = self.entCodice.get() 
+        else:
+           mb.showerror("Errore", "Si è verificato un errore:Codice non può essere vuoto")
+           return
+        
+        if(self.entQuantita.get().strip()!="") :
+           quantita = self.entQuantita.get() 
+        else:
+           mb.showerror("Errore", "Si è verificato un errore:Quantita non può essere vuoto")
+           return
+      
+        try:
+            query = "INSERT INTO Ordini (prodottoID,quantità ,codice) VALUES (?, ?, ?)"
+            cursor.execute(query, (prodotto_id, quantita,codice))
+            sqliteConnection.commit()
+            mb.showinfo('Informazione', "Ordine registrato con successo!")
+            self.load_ordini_data()
+            frmnotifiche.insert_notification('Inserito un nuovo ordine ' + codice)
+           
+        except sqlite3.Error as err:
+            print(err)
+            cursor.close()
+            sqliteConnection.close()
+            mb.showinfo('Informazione', "Errore nell'inserimento dell 'ordine!")
+            sqliteConnection.rollback()
+ 
 
-    # Calculate the x and y coordinates to center the window
-    x = (screen_width / 2) - (window_width / 2)
-    y = (screen_height / 2) - (window_height / 2)
-
-    root.geometry(f'{window_width}x{window_height}+{int(x)}+{int(y)}')
-    root.mainloop()
-
-# Esegui la GUI
-#main_window()
+    def delete_ordine_data(self):
+      MsgBox = mb.askquestion('Cancella record', 'Sei sicuro di volerlo cancellare?', icon='warning')
+      if MsgBox == 'yes':
+          for selection in self.tvOrdini.selection():
+            item = self.tvOrdini.item(selection)
+          Id = item["values"][0]
+          query = "DELETE FROM Ordini WHERE ordineID=?"
+          cursor.execute(query, (Id,))
+          sqliteConnection.commit()
+          mb.showinfo("Information", "Record cancellato")
+          self.clear_form()
+          self.load_prodotti_data()
+          
+    def load_ordini_data(self):
+        self.tvOrdini.delete(*self.tvOrdini.get_children())
+        query = "SELECT ordineID,prodottoID,quantità_ordinata, codice_spedizione FROM Ordini"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        for row in rows:
+            self.tvOrdini.insert("", 'end', values=row)
+    def show_selected_record(self,event):
+        self.clear_form()
+        for selection in self.tvOrdini.selection():
+            item = self.tvOrdini.item(selection)
+        Id,prodottoId, codice, quantita = item["values"][0:7]
+        self.entProdottoId.insert(0, prodottoId)
+        self.entCodice.insert(0, codice)
+        self.entQuantita.insert(0, quantita)
+        
+     
+        return Id
+    
+    def clear_form(self):
+        self.entProdottoId.delete(0, tk.END)
+        self.entCodice.delete(0, tk.END)
+        self.entQuantita.delete(0, tk.END)
+        
+    def exit(self):
+      MsgBox = mb.askquestion('Exit Application', 'Sei sicuro di voler uscire?', icon='warning')
+      if MsgBox == 'yes':
+        self.destroy()
+if __name__ == "__main__":
+    app = OrdiniApp()
+    app.mainloop()
