@@ -1,21 +1,21 @@
 import tkinter as tk
 from tkinter import messagebox, simpledialog
-import mysql.connector
+import sqlite3 as sqlite3
+import login
 
 # Connessione al database
 def get_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="dbwarehouse"
-    )
+    # Connessione al database
+        sqliteConnection = sqlite3.connect('./database/dbwarehouse.db')
+        
+        return sqliteConnection
+    
 
 def insert_user(username, password):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO Utenti (username, password) VALUES (%s, %s)", (username, password))
+        cursor.execute("INSERT INTO Utenti (username, password) VALUES (?, ?)", (username, password))
         conn.commit()
         cursor.close()
         conn.close()
@@ -23,13 +23,15 @@ def insert_user(username, password):
         print(f"Si è verificato un errore: {e}")
         messagebox.showerror("Errore", f"Si è verificato un errore: {e}")
 
-def add_user(username, password):
+def add_user(username, password,root):
     vuoti = username.strip() == "" or password.strip() == ""
     if vuoti:
         messagebox.showerror("Errore", "Username e password non possono essere vuoti")
         return
     insert_user(username, password)
     messagebox.showinfo("Info", "Username e password ok")
+    root.destroy()
+    login.authenticate()
 
 def main_window():
     root = tk.Tk()
@@ -52,7 +54,7 @@ def main_window():
     password_entry.grid(row=1, column=1, pady=5)
 
     # Crea e posiziona il pulsante di registrazione
-    reg_button = tk.Button(main_frame, text="Registrati", bg='#4CAF50', fg='white',width=10 ,command=lambda: add_user(username_entry.get(), password_entry.get()))
+    reg_button = tk.Button(main_frame, text="Registrati", bg='#4CAF50', fg='white',width=10 ,command=lambda: add_user(username_entry.get(), password_entry.get(),root))
     reg_button.grid(row=2, column=0, columnspan=2, pady=20)
 
     window_width = 300

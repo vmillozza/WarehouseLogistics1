@@ -16,7 +16,7 @@ class ProdottiApp(tk.Tk):
         super().__init__()
         self.title("Gestione Prodotti")
         self.geometry("1200x650+351+174")
-
+        
         # Etichette e campi di input
         self.lblTitle = tk.Label(self, text="Gestione Prodotti", font=("Helvetica", 16), bg="yellow", fg="green")
         self.lblNomeProdotto = tk.Label(self, text="Nome Prodotto:", font=("Helvetica", 10), bg="blue", fg="yellow")

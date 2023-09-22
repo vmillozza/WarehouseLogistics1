@@ -10,8 +10,14 @@ def close_form():
     root.destroy()
 
 def registrati():
-    close_form()
-    frmutenti.main_window()
+    #close_form()
+    #frmutenti.main_window()
+    root.after(1000, lambda: login_button.config(state=tk.DISABLED))
+    username_entry.focus_set()
+    
+
+
+
 
 def authenticate():
     try:
