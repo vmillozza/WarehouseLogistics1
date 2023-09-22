@@ -86,9 +86,13 @@ class ProdottiApp(tk.Tk):
         self.destroy()
     
     def GestOrdini(self):
-        for selection in self.tvProdotti.selection():
-            item = self.tvProdotti.item(selection)
-        Id = item["values"][0]
+        if(len(self.tvProdotti.selection())!=0):
+            for selection in self.tvProdotti.selection():
+                item = self.tvProdotti.item(selection)
+                Id = item["values"][0]
+                #Nome = item["values"][1]
+        else:
+           Id=None
         self.close_form()
         frmordini.OrdiniApp(IdProdotto=Id)
     

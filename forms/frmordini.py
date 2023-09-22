@@ -18,23 +18,27 @@ class OrdiniApp(tk.Tk):
 
         # Etichette e campi di input
         self.lblTitle = tk.Label(self, text="Gestione Ordini", font=("Helvetica", 16), bg="yellow", fg="green")
+        # Etichette e campi di input
+       
         self.lblProdottoId = tk.Label(self, text="Prodotto Id:", font=("Helvetica", 10), bg="blue", fg="yellow")
+        self.lblCodice = tk.Label(self, text="Codice:", font=("Helvetica", 10), bg="blue", fg="yellow")
         self.lblQuantita = tk.Label(self, text="Quantità:", font=("Helvetica", 10), bg="blue", fg="yellow")
-        self.lblCodice = tk.Label(self, text="Codice Spedizione:", font=("Helvetica", 10), bg="blue", fg="yellow")
-        
+       
 
         self.entProdottoId = tk.Entry(self)
-        self.entQuantita = tk.Entry(self)
         self.entCodice = tk.Entry(self)
+        self.entQuantita = tk.Entry(self)
         
 
         # Posizionamento degli elementi
         self.lblTitle.pack(pady=20)
         self.lblProdottoId.pack(pady=5)
-       
+        self.entProdottoId.pack(pady=5)
         self.lblCodice.pack(pady=5)
-      
+        self.entCodice.pack(pady=5)
         self.lblQuantita.pack(pady=5)
+        self.entQuantita.pack(pady=5)
+        
        
        
         self.entSearch = tk.Entry(self)
@@ -63,7 +67,7 @@ class OrdiniApp(tk.Tk):
         if(IdProdotto==None):
             self.load_ordini_data()
         else:
-            self.load_ordini_data(IdProdotto)
+            self.load_ordini_data_by_IdProdotto(IdProdotto)
        
     def update_ordini_data(self):
     
@@ -103,13 +107,14 @@ class OrdiniApp(tk.Tk):
            return
       
         try:
+
             query = "INSERT INTO Ordini (prodottoID,quantità ,codice) VALUES (?, ?, ?)"
             cursor.execute(query, (prodotto_id, quantita,codice))
             sqliteConnection.commit()
             mb.showinfo('Informazione', "Ordine registrato con successo!")
             self.load_ordini_data()
             frmnotifiche.insert_notification('Inserito un nuovo ordine ' + codice)
-           
+
         except sqlite3.Error as err:
             print(err)
             cursor.close()
@@ -138,11 +143,18 @@ class OrdiniApp(tk.Tk):
         rows = cursor.fetchall()
         for row in rows:
             self.tvOrdini.insert("", 'end', values=row)
+    def load_ordini_data_by_IdProdotto(self,IdProdotto):
+        self.tvOrdini.delete(*self.tvOrdini.get_children())
+        query = "SELECT ordineID,prodottoID,quantità_ordinata, codice_spedizione FROM Ordini where prodottoID = "+str(IdProdotto)
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        for row in rows:
+            self.tvOrdini.insert("", 'end', values=row)
     def show_selected_record(self,event):
         self.clear_form()
         for selection in self.tvOrdini.selection():
             item = self.tvOrdini.item(selection)
-        Id,prodottoId, codice, quantita = item["values"][0:7]
+        Id,prodottoId, quantita,codice = item["values"][0:7]
         self.entProdottoId.insert(0, prodottoId)
         self.entCodice.insert(0, codice)
         self.entQuantita.insert(0, quantita)
