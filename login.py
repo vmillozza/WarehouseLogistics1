@@ -13,10 +13,6 @@ def registrati():
     close_form()
     frmutenti.main_window()
     
-    
-
-
-
 
 def authenticate():
     try:

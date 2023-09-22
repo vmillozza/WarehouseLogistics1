@@ -11,11 +11,15 @@ cursor = sqliteConnection.cursor()
 
 
 class OrdiniApp(tk.Tk):
+
     def __init__(self,IdProdotto):
         super().__init__()
         self.title("Gestione Ordini")
         self.geometry("1200x650+351+174")
 
+        def on_combobox_select(event):
+                selected_value = self.combobox.get()
+                print(f"Selected product: {selected_value}")
         # Etichette e campi di input
         self.lblTitle = tk.Label(self, text="Gestione Ordini", font=("Helvetica", 16), bg="yellow", fg="green")
         # Etichette e campi di input
@@ -25,7 +29,15 @@ class OrdiniApp(tk.Tk):
         self.lblQuantita = tk.Label(self, text="Quantità:", font=("Helvetica", 10), bg="blue", fg="yellow")
        
 
-        self.entProdottoId = tk.Entry(self)
+        #self.entProdottoId = tk.Entry(self)
+        # Crea un Combobox
+        # Crea un Combobox per i prodotti
+        self.combobox = ttk.Combobox(self, values=("Prodotto 1", "Prodotto 2", "Prodotto 3"))
+        
+        self.combobox.set("Seleziona un prodotto")
+        self.combobox.bind("<<ComboboxSelected>>", on_combobox_select)
+        self.load_combobox_values()
+
         self.entCodice = tk.Entry(self)
         self.entQuantita = tk.Entry(self)
         
@@ -33,14 +45,12 @@ class OrdiniApp(tk.Tk):
         # Posizionamento degli elementi
         self.lblTitle.pack(pady=20)
         self.lblProdottoId.pack(pady=5)
-        self.entProdottoId.pack(pady=5)
+        self.combobox.pack(pady=5)  # Posiziona il Combobox
         self.lblCodice.pack(pady=5)
         self.entCodice.pack(pady=5)
         self.lblQuantita.pack(pady=5)
         self.entQuantita.pack(pady=5)
         
-       
-       
         self.entSearch = tk.Entry(self)
         self.btn_search = tk.Button(self, text="Search", font=("Helvetica", 11), bg="yellow", fg="blue",command=None)
         
@@ -68,7 +78,16 @@ class OrdiniApp(tk.Tk):
             self.load_ordini_data()
         else:
             self.load_ordini_data_by_IdProdotto(IdProdotto)
-       
+    
+    def load_combobox_values(self):
+        # Esegui una query sul database per ottenere i nomi dei prodotti (o qualsiasi altro valore desideri)
+        cursor.execute("SELECT prodottoID,nome_prodotto FROM Prodotti")
+        products = cursor.fetchall()
+
+        # Estrai i valori dalla tupla e popola il Combobox
+
+        self.combobox['values']  = products
+        
     def update_ordini_data(self):
     
         prodotto_id = self.entProdottoId.get()  # Assumo che tu stia cercando di ottenere il valore da un widget Entry
@@ -88,8 +107,8 @@ class OrdiniApp(tk.Tk):
         self.load_ordini_data()
 
     def register_ordine(self):
-        if(self.entProdottoId.get().strip()!="") :
-           prodotto_id = self.entProdottoId.get()
+        if(self.combobox.get().split(" ")[0]!="" or self.combobox.get()!="Seleziona un prodotto") :
+           prodotto_id = self.combobox.get().split(" ")[0]
         else:
          mb.showerror("Errore", "Si è verificato un errore:id prodotto non può essere vuoto")
          return
@@ -107,7 +126,8 @@ class OrdiniApp(tk.Tk):
            return
       
         try:
-
+            sqliteConnection = sqlite3.connect('./database/dbwarehouse.db')
+            cursor = sqliteConnection.cursor()
             query = "INSERT INTO Ordini (prodottoID,quantità_ordinata ,codice_spedizione) VALUES (?, ?, ?)"
             cursor.execute(query, (prodotto_id, quantita,codice))
             sqliteConnection.commit()
