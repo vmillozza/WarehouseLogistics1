@@ -90,7 +90,7 @@ class OrdiniApp(tk.Tk):
         
     def update_ordini_data(self):
     
-        prodotto_id = self.entProdottoId.get()  # Assumo che tu stia cercando di ottenere il valore da un widget Entry
+        prodotto_id = self.combobox.get().split(" ")[0]  # Assumo che tu stia cercando di ottenere il valore da un widget Entry
         codice = self.entCodice.get()
         quantita = self.entQuantita.get()
         for selection in self.tvOrdini.selection():
@@ -175,7 +175,7 @@ class OrdiniApp(tk.Tk):
         for selection in self.tvOrdini.selection():
             item = self.tvOrdini.item(selection)
         Id,prodottoId, quantita,codice = item["values"][0:7]
-        self.entProdottoId.insert(0, prodottoId)
+        #self.entProdottoId.insert(0, prodottoId)
         self.entCodice.insert(0, codice)
         self.entQuantita.insert(0, quantita)
         
@@ -183,7 +183,7 @@ class OrdiniApp(tk.Tk):
         return Id
     
     def clear_form(self):
-        self.entProdottoId.delete(0, tk.END)
+        #self.entProdottoId.delete(0, tk.END)
         self.entCodice.delete(0, tk.END)
         self.entQuantita.delete(0, tk.END)
         
