@@ -58,12 +58,14 @@ username_label = tk.Label(frame, text="Username:", font=label_font, bg='#f2f2f2'
 username_label.grid(row=0, column=0, sticky='w', pady=10)
 
 username_entry = tk.Entry(frame, font=entry_font)
+username_entry.insert(0, "lallo")
 username_entry.grid(row=1, column=0, pady=5, padx=20, sticky='ew')
 
 password_label = tk.Label(frame, text="Password:", font=label_font, bg='#f2f2f2')
 password_label.grid(row=2, column=0, sticky='w', pady=10)
 
 password_entry = tk.Entry(frame, show="*", font=entry_font)
+password_entry.insert(0, "password")
 password_entry.grid(row=3, column=0, pady=5, padx=20, sticky='ew')
 
 login_button = tk.Button(frame, text="Login", command=authenticate, font=button_font, bg='#4CAF50', fg='white')

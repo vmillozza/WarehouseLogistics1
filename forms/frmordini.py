@@ -108,7 +108,7 @@ class OrdiniApp(tk.Tk):
       
         try:
 
-            query = "INSERT INTO Ordini (prodottoID,quantità ,codice) VALUES (?, ?, ?)"
+            query = "INSERT INTO Ordini (prodottoID,quantità_ordinata ,codice_spedizione) VALUES (?, ?, ?)"
             cursor.execute(query, (prodotto_id, quantita,codice))
             sqliteConnection.commit()
             mb.showinfo('Informazione', "Ordine registrato con successo!")
